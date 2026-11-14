@@ -3,277 +3,361 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SINA-VISUAL PRO | Estacion Cardiologica IA</title>
+  <meta name="color-scheme" content="dark light" />
+  <title>SINA-VISUAL PRO · Estación Cardiológica</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-alert="idle">
-  <!-- ESCENARIO PRINCIPAL: SALA MEDICA ESTILO VIDEOJUEGO -->
-  <div id="scene-stage">
+<body>
+  <!-- =====================================================
+       SALA DE CARDIOLOGÍA (ESCENA PRINCIPAL)
+       ===================================================== -->
+  <div id="scene-stage" aria-label="Sala de cardiología">
     <div class="room-backdrop" role="presentation"></div>
-    <div class="room-ambient-vignette"></div>
-    <div class="room-scanlines"></div>
+    <div class="room-tint" role="presentation"></div>
+    <div class="room-grid" role="presentation"></div>
 
-    <!-- MONITOR ECG HOLOGRAFICO EN LA ESCENA -->
-    <div class="holo-telemetry-overlay">
-      <div class="holo-screen-header">
-        <span class="pulse-dot"></span>
-        <span id="holo-state-label">TELEMETRIA UCI · EN ESPERA</span>
-        <span id="holo-bpm-badge">72 BPM</span>
-      </div>
-      <canvas id="scene-ecg-canvas" width="420" height="110"></canvas>
-    </div>
-
-    <!-- PUNTOS INTERACTIVOS (HOTSPOTS) EN LA SALA MEDICA -->
-    <button class="room-hotspot" style="left: 19%; top: 53%;" data-open-panel="neural" title="Abrir Nucleo IA y Entrenamiento">
-      <span class="hotspot-ping"></span>
-      <span class="hotspot-core">IA</span>
-      <span class="hotspot-tag">Nucleo IA &amp; Telemetria</span>
+    <button class="room-hotspot" style="left: 19%; top: 53%;" data-open-panel="neural" title="Abrir Núcleo IA y entrenamiento">
+      <span class="hotspot-mark" aria-hidden="true"></span>
+      <span class="hotspot-plate">
+        <span class="hotspot-code">ST-04</span>
+        <span class="hotspot-name">Núcleo IA</span>
+      </span>
     </button>
 
-    <button class="room-hotspot" style="left: 44%; top: 41%;" data-open-panel="cases" title="Abrir Archivo Clinico y Casos">
-      <span class="hotspot-ping"></span>
-      <span class="hotspot-core">Rx</span>
-      <span class="hotspot-tag">Archivo Clinico</span>
+    <button class="room-hotspot" style="left: 44%; top: 41%;" data-open-panel="cases" title="Abrir archivo clínico y casos">
+      <span class="hotspot-mark" aria-hidden="true"></span>
+      <span class="hotspot-plate">
+        <span class="hotspot-code">ST-03</span>
+        <span class="hotspot-name">Archivo clínico</span>
+      </span>
     </button>
 
-    <button class="room-hotspot" style="left: 65%; top: 47%;" data-open-panel="bmp" title="Abrir Escaner de Imagen ECG (BMP)">
-      <span class="hotspot-ping"></span>
-      <span class="hotspot-core">ECG</span>
-      <span class="hotspot-tag">Escaner Imagen BMP</span>
+    <button class="room-hotspot" style="left: 65%; top: 47%;" data-open-panel="bmp" title="Abrir escáner de imagen ECG">
+      <span class="hotspot-mark" aria-hidden="true"></span>
+      <span class="hotspot-plate">
+        <span class="hotspot-code">ST-01</span>
+        <span class="hotspot-name">Escáner ECG</span>
+      </span>
     </button>
 
-    <button class="room-hotspot" style="left: 88%; top: 56%;" data-open-panel="manual" title="Abrir Monitor de Signos Vitales">
-      <span class="hotspot-ping"></span>
-      <span class="hotspot-core">BPM</span>
-      <span class="hotspot-tag">Signos Vitales</span>
+    <button class="room-hotspot" style="left: 88%; top: 56%;" data-open-panel="manual" title="Abrir variables clínicas">
+      <span class="hotspot-mark" aria-hidden="true"></span>
+      <span class="hotspot-plate">
+        <span class="hotspot-code">ST-02</span>
+        <span class="hotspot-name">Variables clínicas</span>
+      </span>
     </button>
+
+    <p class="room-caption">
+      <span class="mono">SALA 3B · CARDIOLOGÍA</span>
+      <span class="room-caption-sep" aria-hidden="true"></span>
+      Seleccione una estación en la sala o en la consola inferior.
+    </p>
   </div>
 
-  <!-- HUD SUPERIOR -->
-  <header class="hud-topbar">
-    <div class="brand-cluster">
-      <div class="brand-logo">SV</div>
-      <div>
-        <div class="brand-title">SINA-VISUAL <span class="badge-pro">PRO</span></div>
-        <div class="brand-sub">Motor Neuronal C11 · Diagnostico Cardiologico</div>
+  <!-- =====================================================
+       CHASIS SUPERIOR
+       ===================================================== -->
+  <header class="chassis-top">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 24" width="40" height="24">
+          <polyline points="0,14 9,14 12,9 15,14 18,14 21,2 24,22 27,14 31,14 34,11 37,14 40,14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">SINA—VISUAL <span class="brand-model">PRO</span></div>
+        <div class="brand-sub mono">MOTOR NEURONAL C11 · MOD. SV-2</div>
       </div>
     </div>
 
-    <div class="hud-status-strip">
-      <div class="status-pill" id="pill-bmp">
-        <span class="dot"></span>
-        <span>Red BMP: <strong id="status-bmp-text">Cargando...</strong></span>
+    <div class="status-rack" aria-label="Estado del sistema">
+      <div class="status-cell" id="pill-bmp">
+        <span class="led" aria-hidden="true"></span>
+        <span class="status-label mono">RED BMP</span>
+        <span class="status-value mono" id="status-bmp-text">···</span>
       </div>
-      <div class="status-pill" id="pill-manual">
-        <span class="dot"></span>
-        <span>Red Manual: <strong id="status-manual-text">Cargando...</strong></span>
+      <div class="status-cell" id="pill-manual">
+        <span class="led" aria-hidden="true"></span>
+        <span class="status-label mono">RED CLÍNICA</span>
+        <span class="status-value mono" id="status-manual-text">···</span>
       </div>
-      <div class="status-pill">
-        <span>Casos: <strong id="status-cases-count">0</strong></span>
+      <div class="status-cell">
+        <span class="status-label mono">CASOS</span>
+        <span class="status-value mono" id="status-cases-count">0</span>
       </div>
     </div>
 
-    <div class="hud-actions">
-      <button id="btn-audio-toggle" class="hud-btn" title="Activar/Silenciar pulso sonoro">
-        Sonido: OFF
-      </button>
-      <button id="btn-room-view" class="hud-btn" title="Ocultar paneles para ver la sala medica">
-        Vista Sala
-      </button>
-      <button id="btn-shutdown" class="hud-btn hud-btn-danger" title="Cerrar servidor y aplicacion">
-        Salir
-      </button>
+    <div class="chassis-actions">
+      <button id="btn-room-view" class="btn btn-ghost" type="button" title="Ocultar paneles y ver la sala">Vista sala</button>
+      <button id="btn-shutdown" class="btn btn-ghost btn-ghost-danger" type="button" title="Detener servidor y cerrar">Apagar</button>
     </div>
   </header>
 
-  <!-- CONTENEDOR DE PANELES FLOTANTES -->
+  <!-- =====================================================
+       ÁREA DE TRABAJO (PANELES)
+       ===================================================== -->
   <main id="panel-workspace" class="panel-workspace hidden">
-    <!-- PANEL 1: ESCANER BMP -->
-    <section id="panel-bmp" class="clinical-panel hidden">
-      <div class="panel-header">
-        <div>
-          <span class="panel-kicker">ESTACION DE VISION NEURONAL (1024 ENTRADAS)</span>
-          <h2>Escaner de Electrocardiograma BMP</h2>
+
+    <!-- ===================== ST-01 · ESCÁNER ECG ===================== -->
+    <section id="panel-bmp" class="clinical-panel hidden" aria-labelledby="ttl-bmp">
+      <header class="panel-head">
+        <div class="panel-head-text">
+          <span class="panel-code mono">ST-01 // VISIÓN NEURONAL · 1024 ENTRADAS</span>
+          <h2 id="ttl-bmp">Escáner de electrocardiograma</h2>
         </div>
-        <button class="panel-close" data-close-panel>&times;</button>
-      </div>
+        <button class="panel-close" type="button" data-close-panel aria-label="Cerrar escáner">
+          <span aria-hidden="true">×</span>
+        </button>
+      </header>
 
-      <div class="panel-grid-2">
-        <form id="form-bmp" class="card-block">
-          <h3>1. Datos del Paciente</h3>
-          <div class="form-row-2">
-            <label>Nombre completo
-              <input type="text" id="bmp-nombre" required placeholder="Ej. Maria Gonzalez" />
-            </label>
-            <label>Cedula
-              <input type="text" id="bmp-cedula" required pattern="[0-9]{6,10}" placeholder="Ej. 31178335" />
-            </label>
-          </div>
-          <div class="form-row-2">
-            <label>Medico tratante
-              <input type="text" id="bmp-medico" required placeholder="Ej. Dr. Neira" />
-            </label>
-            <label>Fecha (DD/MM/AAAA)
-              <input type="text" id="bmp-fecha" required placeholder="13/11/2026" />
-            </label>
-          </div>
-
-          <h3>2. Imagen del Electrocardiograma</h3>
-          <div id="bmp-dropzone" class="dropzone">
-            <input type="file" id="bmp-file-input" accept=".bmp,.png,.jpg,.jpeg,image/*" hidden />
-            <p class="drop-title">Arrastra una imagen ECG o haz clic para seleccionar</p>
-            <p class="drop-sub">Soporta .BMP nativo (24/32 bits) o .PNG/.JPG (conversion automatica a BMP 24-bit)</p>
-            <span id="bmp-file-name" class="file-chip hidden"></span>
-          </div>
-
-          <div class="samples-bar">
-            <span class="samples-label">Muestras rapidas:</span>
-            <div id="samples-list" class="samples-chips"></div>
+      <div class="scanner-grid">
+        <!-- Columna izquierda: ficha + entrada de señal -->
+        <form id="form-bmp" class="sheet" novalidate>
+          <div class="sheet-section">
+            <h3 class="sheet-title"><span class="mono">[01]</span> Ficha del paciente</h3>
+            <div class="field-grid">
+              <label class="field">
+                <span class="field-label">Nombre completo</span>
+                <input type="text" id="bmp-nombre" autocomplete="off" placeholder="María González" />
+              </label>
+              <label class="field">
+                <span class="field-label">Cédula</span>
+                <input type="text" id="bmp-cedula" class="mono" inputmode="numeric" pattern="[0-9]{6,10}" autocomplete="off" placeholder="31178335" />
+              </label>
+              <label class="field">
+                <span class="field-label">Médico tratante</span>
+                <input type="text" id="bmp-medico" autocomplete="off" placeholder="Dr. Neira" />
+              </label>
+              <label class="field">
+                <span class="field-label">Fecha · DD/MM/AAAA</span>
+                <input type="text" id="bmp-fecha" class="mono" autocomplete="off" placeholder="13/11/2026" />
+              </label>
+            </div>
           </div>
 
-          <button type="submit" class="btn-primary btn-full">Analizar Electrocardiograma con IA</button>
+          <div class="sheet-section">
+            <h3 class="sheet-title"><span class="mono">[02]</span> Entrada de señal</h3>
+            <div id="bmp-dropzone" class="dropzone" role="button" tabindex="0" aria-label="Seleccionar imagen ECG">
+              <input type="file" id="bmp-file-input" accept=".bmp,.png,.jpg,.jpeg,image/*" hidden />
+              <span class="drop-corner tl" aria-hidden="true"></span>
+              <span class="drop-corner tr" aria-hidden="true"></span>
+              <span class="drop-corner bl" aria-hidden="true"></span>
+              <span class="drop-corner br" aria-hidden="true"></span>
+              <p class="drop-title">Arrastre el trazado ECG aquí</p>
+              <p class="drop-sub mono">BMP 24/32 BITS · PNG · JPG → CONVERSIÓN A BMP 24-BIT EN CLIENTE</p>
+              <span id="bmp-file-name" class="file-tag mono hidden"></span>
+            </div>
+
+            <div class="samples-row">
+              <span class="samples-label mono">MUESTRAS</span>
+              <div id="samples-list" class="samples-list"></div>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-analyze-bmp" class="btn btn-primary btn-block">
+            <span class="btn-led" aria-hidden="true"></span>
+            Analizar trazado
+          </button>
         </form>
 
-        <div class="card-block result-column">
-          <h3>3. Diagnostico y Vision Artificial</h3>
-          <div id="bmp-result-empty" class="empty-state">
-            Selecciona una imagen ECG o prueba una muestra para visualizar la matriz 32x32 y el diagnostico de la red neuronal.
+        <!-- Columna derecha: módulo de telemetría y visión -->
+        <div class="telemetry-module" aria-label="Módulo de telemetría y visión">
+          <div class="module-title-row">
+            <h3 class="sheet-title"><span class="mono">[03]</span> Telemetría &amp; matriz 32×32</h3>
+            <span id="bmp-scan-meta" class="mono module-meta">SIN ESTUDIO</span>
           </div>
 
-          <div id="bmp-result-content" class="hidden">
-            <div class="vision-compare">
-              <div class="vision-box">
-                <span>Imagen Original</span>
-                <img id="bmp-orig-preview" alt="ECG Original" />
+          <!-- Monitor osciloscopio -->
+          <div id="ecg-monitor" class="monitor" data-alert="idle">
+            <div class="monitor-bar">
+              <span class="led led-monitor" aria-hidden="true"></span>
+              <span id="holo-state-label" class="monitor-state mono">SIN ESTUDIO · MONITOR EN ESPERA</span>
+              <div id="holo-bpm-badge" class="monitor-bpm" aria-live="polite">
+                <span id="holo-bpm-value" class="mono">---</span>
+                <span class="monitor-bpm-unit mono">BPM</span>
               </div>
-              <div class="vision-box">
-                <span>Matriz Neuronal (32x32)</span>
-                <canvas id="bmp-matrix-canvas" width="160" height="160"></canvas>
-              </div>
+              <button id="btn-audio-toggle" class="monitor-audio mono" type="button" aria-pressed="false" title="Activar o silenciar el pulso sonoro del monitor">
+                <span class="audio-led" aria-hidden="true"></span>
+                <span id="audio-toggle-text">AUDIO OFF</span>
+              </button>
             </div>
-            <div id="bmp-diagnosis-box"></div>
+            <div class="monitor-screen">
+              <canvas id="scene-ecg-canvas" width="640" height="150" aria-label="Osciloscopio ECG"></canvas>
+            </div>
+            <div class="monitor-foot mono">
+              <span>DERIV. II</span>
+              <span>25 mm/s</span>
+              <span>10 mm/mV</span>
+              <span class="monitor-foot-note">TRAZO SINTÉTICO SEGÚN CLASE PREDICHA</span>
+            </div>
+          </div>
+
+          <!-- Comparativa visual -->
+          <div class="vision-pair">
+            <figure class="vision-frame">
+              <figcaption class="mono">IMAGEN ORIGINAL</figcaption>
+              <div class="vision-view vision-view-photo">
+                <img id="bmp-orig-preview" alt="Trazado ECG original" class="hidden" />
+                <span id="bmp-orig-empty" class="vision-empty mono">SIN IMAGEN</span>
+              </div>
+            </figure>
+            <figure class="vision-frame">
+              <figcaption class="mono">MATRIZ NEURONAL 32×32</figcaption>
+              <div class="vision-view vision-view-matrix">
+                <canvas id="bmp-matrix-canvas" width="192" height="192" aria-label="Matriz de entrada 32 por 32"></canvas>
+              </div>
+            </figure>
+          </div>
+
+          <!-- Diagnóstico -->
+          <div id="bmp-diagnosis-box" class="diagnosis-slot">
+            <div class="slot-empty">
+              <span class="mono">DIAGNÓSTICO PENDIENTE</span>
+              <p>Cargue un trazado o elija una muestra y pulse <strong>Analizar trazado</strong>.</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PANEL 2: SIGNOS VITALES MANUALES -->
-    <section id="panel-manual" class="clinical-panel hidden">
-      <div class="panel-header">
-        <div>
-          <span class="panel-kicker">MONITOR DE SIGNOS VITALES (5 VARIABLES CLINICAS)</span>
-          <h2>Analisis por Intervalos Electrocardiograficos</h2>
+    <!-- ===================== ST-02 · VARIABLES CLÍNICAS ===================== -->
+    <section id="panel-manual" class="clinical-panel hidden" aria-labelledby="ttl-manual">
+      <header class="panel-head">
+        <div class="panel-head-text">
+          <span class="panel-code mono">ST-02 // INTERVALOS ELECTROCARDIOGRÁFICOS · 5 ENTRADAS</span>
+          <h2 id="ttl-manual">Variables clínicas</h2>
         </div>
-        <button class="panel-close" data-close-panel>&times;</button>
-      </div>
+        <button class="panel-close" type="button" data-close-panel aria-label="Cerrar variables clínicas">
+          <span aria-hidden="true">×</span>
+        </button>
+      </header>
 
-      <div class="panel-grid-2">
-        <form id="form-manual" class="card-block">
-          <h3>1. Datos del Paciente</h3>
-          <div class="form-row-2">
-            <label>Nombre completo
-              <input type="text" id="man-nombre" required placeholder="Ej. Carlos Mendoza" />
-            </label>
-            <label>Cedula
-              <input type="text" id="man-cedula" required pattern="[0-9]{6,10}" placeholder="Ej. 28450120" />
-            </label>
-          </div>
-          <div class="form-row-2">
-            <label>Medico tratante
-              <input type="text" id="man-medico" required placeholder="Ej. Dr. Neira" />
-            </label>
-            <label>Fecha (DD/MM/AAAA)
-              <input type="text" id="man-fecha" required placeholder="13/11/2026" />
-            </label>
-          </div>
-
-          <div class="presets-bar">
-            <span>Perfiles clinicos de prueba:</span>
-            <div class="preset-buttons">
-              <button type="button" class="btn-chip" data-preset="normal">Normal</button>
-              <button type="button" class="btn-chip" data-preset="arritmia">Arritmia</button>
-              <button type="button" class="btn-chip" data-preset="infarto">Infarto (MI)</button>
-              <button type="button" class="btn-chip" data-preset="historial">Post-MI</button>
+      <div class="panel-split">
+        <form id="form-manual" class="sheet" novalidate>
+          <div class="sheet-section">
+            <h3 class="sheet-title"><span class="mono">[01]</span> Ficha del paciente</h3>
+            <div class="field-grid">
+              <label class="field">
+                <span class="field-label">Nombre completo</span>
+                <input type="text" id="man-nombre" autocomplete="off" placeholder="Carlos Mendoza" />
+              </label>
+              <label class="field">
+                <span class="field-label">Cédula</span>
+                <input type="text" id="man-cedula" class="mono" inputmode="numeric" pattern="[0-9]{6,10}" autocomplete="off" placeholder="28450120" />
+              </label>
+              <label class="field">
+                <span class="field-label">Médico tratante</span>
+                <input type="text" id="man-medico" autocomplete="off" placeholder="Dr. Neira" />
+              </label>
+              <label class="field">
+                <span class="field-label">Fecha · DD/MM/AAAA</span>
+                <input type="text" id="man-fecha" class="mono" autocomplete="off" placeholder="13/11/2026" />
+              </label>
             </div>
           </div>
 
-          <h3>2. Parametros ECG Brutos</h3>
-          <div class="sliders-stack">
-            <div class="slider-item">
-              <div class="slider-head"><span>Intervalo RR (ms)</span><strong id="val-rr">820</strong></div>
-              <input type="range" id="man-rr" min="300" max="1500" value="820" />
+          <div class="sheet-section">
+            <div class="section-row">
+              <h3 class="sheet-title"><span class="mono">[02]</span> Intervalos</h3>
+              <div class="segmented" role="group" aria-label="Perfiles clínicos de prueba">
+                <button type="button" class="seg-btn" data-preset="normal">Normal</button>
+                <button type="button" class="seg-btn" data-preset="arritmia">Arritmia</button>
+                <button type="button" class="seg-btn" data-preset="infarto">Infarto</button>
+                <button type="button" class="seg-btn" data-preset="historial">Post-MI</button>
+              </div>
             </div>
-            <div class="slider-item">
-              <div class="slider-head"><span>Intervalo PR (ms)</span><strong id="val-pr">162</strong></div>
-              <input type="range" id="man-pr" min="80" max="300" value="162" />
-            </div>
-            <div class="slider-item">
-              <div class="slider-head"><span>Complejo QRS (ms)</span><strong id="val-qrs">91</strong></div>
-              <input type="range" id="man-qrs" min="50" max="200" value="91" />
-            </div>
-            <div class="slider-item">
-              <div class="slider-head"><span>Intervalo QT (ms)</span><strong id="val-qt">405</strong></div>
-              <input type="range" id="man-qt" min="250" max="600" value="405" />
-            </div>
-            <div class="slider-item">
-              <div class="slider-head"><span>Frecuencia Cardiaca (BPM)</span><strong id="val-bpm">73</strong></div>
-              <input type="range" id="man-bpm" min="30" max="200" value="73" />
+
+            <div class="dial-stack">
+              <div class="dial">
+                <div class="dial-head"><span class="mono">RR</span><span class="dial-desc">Intervalo R–R</span><output id="val-rr" class="mono">820</output><span class="dial-unit mono">ms</span></div>
+                <input type="range" id="man-rr" min="300" max="1500" value="820" />
+              </div>
+              <div class="dial">
+                <div class="dial-head"><span class="mono">PR</span><span class="dial-desc">Intervalo P–R</span><output id="val-pr" class="mono">162</output><span class="dial-unit mono">ms</span></div>
+                <input type="range" id="man-pr" min="80" max="300" value="162" />
+              </div>
+              <div class="dial">
+                <div class="dial-head"><span class="mono">QRS</span><span class="dial-desc">Complejo QRS</span><output id="val-qrs" class="mono">91</output><span class="dial-unit mono">ms</span></div>
+                <input type="range" id="man-qrs" min="50" max="200" value="91" />
+              </div>
+              <div class="dial">
+                <div class="dial-head"><span class="mono">QT</span><span class="dial-desc">Intervalo Q–T</span><output id="val-qt" class="mono">405</output><span class="dial-unit mono">ms</span></div>
+                <input type="range" id="man-qt" min="250" max="600" value="405" />
+              </div>
+              <div class="dial">
+                <div class="dial-head"><span class="mono">FC</span><span class="dial-desc">Frecuencia cardíaca</span><output id="val-bpm" class="mono">73</output><span class="dial-unit mono">bpm</span></div>
+                <input type="range" id="man-bpm" min="30" max="200" value="73" />
+              </div>
             </div>
           </div>
 
-          <button type="submit" class="btn-primary btn-full">Evaluar Parametros con Red Clinica</button>
+          <button type="submit" id="btn-analyze-manual" class="btn btn-primary btn-block">
+            <span class="btn-led" aria-hidden="true"></span>
+            Evaluar con red clínica
+          </button>
         </form>
 
-        <div class="card-block result-column">
-          <h3>3. Diagnostico Clinico</h3>
-          <div id="manual-result-empty" class="empty-state">
-            Ajusta los intervalos cardiologicos o selecciona un perfil clinico de prueba para ejecutar la inferencia en el motor C.
-          </div>
-          <div id="manual-result-content" class="hidden">
-            <div id="manual-norm-chips" class="norm-chips"></div>
-            <div id="manual-diagnosis-box"></div>
+        <div class="sheet">
+          <div class="sheet-section">
+            <h3 class="sheet-title"><span class="mono">[03]</span> Resultado clínico</h3>
+            <div id="manual-norm-chips" class="norm-strip"></div>
+            <div id="manual-diagnosis-box" class="diagnosis-slot">
+              <div class="slot-empty">
+                <span class="mono">EVALUACIÓN PENDIENTE</span>
+                <p>Ajuste los intervalos o cargue un perfil de prueba y ejecute la inferencia en el motor C.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PANEL 3: ARCHIVO CLINICO Y CASOS -->
-    <section id="panel-cases" class="clinical-panel hidden">
-      <div class="panel-header">
-        <div>
-          <span class="panel-kicker">ARCHIVO HOSPITALARIO &amp; VERIFICACION MEDICA</span>
-          <h2>Casos, Estadisticas y Reportes de Pacientes</h2>
+    <!-- ===================== ST-03 · ARCHIVO CLÍNICO ===================== -->
+    <section id="panel-cases" class="clinical-panel hidden" aria-labelledby="ttl-cases">
+      <header class="panel-head">
+        <div class="panel-head-text">
+          <span class="panel-code mono">ST-03 // ARCHIVO HOSPITALARIO · VERIFICACIÓN MÉDICA</span>
+          <h2 id="ttl-cases">Casos, estadísticas y reportes</h2>
         </div>
-        <button class="panel-close" data-close-panel>&times;</button>
-      </div>
+        <button class="panel-close" type="button" data-close-panel aria-label="Cerrar archivo clínico">
+          <span aria-hidden="true">×</span>
+        </button>
+      </header>
 
-      <div class="stats-kpi-grid" id="cases-kpi-grid"></div>
+      <div class="counter-row" id="cases-kpi-grid"></div>
 
-      <div class="panel-grid-cases">
-        <div class="card-block">
-          <div class="table-toolbar">
-            <h3>Historial de Evaluaciones</h3>
+      <div class="cases-grid">
+        <div class="sheet">
+          <div class="section-row">
+            <h3 class="sheet-title"><span class="mono">[01]</span> Historial de evaluaciones</h3>
             <div class="toolbar-actions">
-              <div class="filter-tabs">
-                <button class="btn-chip active" data-filter="all">Todos</button>
-                <button class="btn-chip" data-filter="pending">Pendientes</button>
-                <button class="btn-chip" data-filter="verified">Verificados</button>
-                <button class="btn-chip" data-filter="discarded">Descartados</button>
+              <div class="segmented" role="group" aria-label="Filtrar casos">
+                <button type="button" class="seg-btn active" data-filter="all">Todos</button>
+                <button type="button" class="seg-btn" data-filter="pending">Pendientes</button>
+                <button type="button" class="seg-btn" data-filter="verified">Verificados</button>
+                <button type="button" class="seg-btn" data-filter="discarded">Descartados</button>
               </div>
-              <button type="button" id="btn-clear-discarded" class="btn-chip btn-chip-danger" title="Eliminar todos los casos descartados">Limpiar descartados</button>
+              <button type="button" id="btn-clear-discarded" class="btn btn-outline-danger btn-sm" title="Eliminar todos los casos descartados">Limpiar descartados</button>
             </div>
           </div>
           <div class="table-scroll">
             <table class="cases-table">
               <thead>
                 <tr>
+                  <th class="mono">N.º</th>
                   <th>Paciente</th>
-                  <th>Cedula</th>
+                  <th>Cédula</th>
                   <th>Modo</th>
-                  <th>Diagnostico</th>
-                  <th>Conf.</th>
+                  <th>Diagnóstico</th>
+                  <th class="num">Conf.</th>
                   <th>Estado</th>
-                  <th>Acciones</th>
+                  <th class="actions-col">Acciones</th>
                 </tr>
               </thead>
               <tbody id="cases-tbody"></tbody>
@@ -281,111 +365,132 @@
           </div>
         </div>
 
-        <div class="card-block">
-          <h3>Distribucion y Reporte Clinico</h3>
+        <div class="sheet">
+          <h3 class="sheet-title"><span class="mono">[02]</span> Distribución por patología</h3>
           <div id="stats-bars" class="stats-bars"></div>
 
-          <div class="report-search-box">
-            <input type="text" id="report-search-cedula" placeholder="Buscar reporte por cedula..." />
-            <button id="btn-search-report" class="btn-secondary">Buscar</button>
-            <button id="btn-print-report" class="btn-secondary">Imprimir</button>
+          <h3 class="sheet-title sheet-title-spaced"><span class="mono">[03]</span> Reporte clínico</h3>
+          <div class="report-search">
+            <input type="text" id="report-search-cedula" class="mono" inputmode="numeric" placeholder="Cédula del paciente" />
+            <button id="btn-search-report" type="button" class="btn btn-secondary btn-sm">Buscar</button>
+            <button id="btn-print-report" type="button" class="btn btn-secondary btn-sm">Imprimir</button>
           </div>
-          <pre id="report-viewer" class="report-pre">Selecciona un paciente o busca por cedula para ver su reporte clinico completo.</pre>
+          <pre id="report-viewer" class="report-paper">Seleccione un paciente (📄) o busque por cédula para ver su reporte clínico.</pre>
         </div>
       </div>
     </section>
 
-    <!-- PANEL 4: NUCLEO IA & ENTRENAMIENTO -->
-    <section id="panel-neural" class="clinical-panel hidden">
-      <div class="panel-header">
-        <div>
-          <span class="panel-kicker">ARQUITECTURA MULTICAPA EN C (PReLU + SIGMOIDE + SGD)</span>
-          <h2>Nucleo de Inteligencia Artificial &amp; Re-entrenamiento</h2>
+    <!-- ===================== ST-04 · NÚCLEO IA ===================== -->
+    <section id="panel-neural" class="clinical-panel hidden" aria-labelledby="ttl-neural">
+      <header class="panel-head">
+        <div class="panel-head-text">
+          <span class="panel-code mono">ST-04 // PERCEPTRÓN MULTICAPA EN C · PReLU + SIGMOIDE + SGD</span>
+          <h2 id="ttl-neural">Núcleo de inteligencia artificial</h2>
         </div>
-        <button class="panel-close" data-close-panel>&times;</button>
-      </div>
+        <button class="panel-close" type="button" data-close-panel aria-label="Cerrar núcleo IA">
+          <span aria-hidden="true">×</span>
+        </button>
+      </header>
 
-      <div class="neural-top-cards">
-        <div class="card-block">
-          <h3>Red Neuronal BMP (Vision ECG)</h3>
-          <div id="info-net-bmp" class="net-meta"></div>
+      <div class="neural-grid">
+        <div class="sheet">
+          <h3 class="sheet-title"><span class="mono">[A]</span> Red de visión ECG</h3>
+          <div id="info-net-bmp" class="spec-list"></div>
         </div>
-        <div class="card-block">
-          <h3>Red Neuronal Clinica (Manual)</h3>
-          <div id="info-net-manual" class="net-meta"></div>
+        <div class="sheet">
+          <h3 class="sheet-title"><span class="mono">[B]</span> Red clínica (intervalos)</h3>
+          <div id="info-net-manual" class="spec-list"></div>
         </div>
-        <div class="card-block">
-          <h3>Control de Entrenamiento (Admin)</h3>
-          <label>PIN Administrador (config.txt)
-            <input type="password" id="train-pin" value="admin123" placeholder="PIN admin" />
+        <div class="sheet sheet-dark">
+          <h3 class="sheet-title"><span class="mono">[C]</span> Control de entrenamiento</h3>
+          <label class="field">
+            <span class="field-label">PIN administrador · data/config.txt</span>
+            <input type="password" id="train-pin" class="mono" value="admin123" autocomplete="off" />
           </label>
           <div class="train-buttons">
-            <button class="btn-secondary" data-train-target="bmp">Entrenar BMP</button>
-            <button class="btn-secondary" data-train-target="manual">Entrenar Manual</button>
-            <button class="btn-primary" data-train-target="both">Re-entrenar Ambas</button>
+            <button class="btn btn-secondary" type="button" data-train-target="bmp">Entrenar BMP</button>
+            <button class="btn btn-secondary" type="button" data-train-target="manual">Entrenar clínica</button>
+            <button class="btn btn-primary" type="button" data-train-target="both">Re-entrenar ambas</button>
           </div>
-          <div id="train-feedback" class="train-feedback"></div>
+          <div id="train-feedback" class="train-feedback mono" aria-live="polite"></div>
         </div>
       </div>
 
-      <div class="panel-grid-2">
-        <div class="card-block">
-          <h3>Curva de Perdida y Precision — Red BMP</h3>
-          <canvas id="chart-bmp" width="520" height="220" class="chart-canvas"></canvas>
+      <div class="panel-split">
+        <div class="sheet">
+          <h3 class="sheet-title"><span class="mono">[D]</span> Pérdida y precisión · red BMP</h3>
+          <canvas id="chart-bmp" class="chart-canvas" width="520" height="220"></canvas>
         </div>
-        <div class="card-block">
-          <h3>Curva de Perdida y Precision — Red Manual</h3>
-          <canvas id="chart-manual" width="520" height="220" class="chart-canvas"></canvas>
+        <div class="sheet">
+          <h3 class="sheet-title"><span class="mono">[E]</span> Pérdida y precisión · red clínica</h3>
+          <canvas id="chart-manual" class="chart-canvas" width="520" height="220"></canvas>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- BARRA INFERIOR DE ESTACIONES -->
-  <nav class="hud-dock">
-    <button class="dock-btn active" data-dock-panel="room">
-      <span class="dock-icon">🏥</span>
-      <span>Sala UCI</span>
+  <!-- =====================================================
+       CONSOLA INFERIOR DE ESTACIONES
+       ===================================================== -->
+  <nav class="console-dock" aria-label="Estaciones">
+    <button class="key active" type="button" data-dock-panel="room">
+      <span class="key-led" aria-hidden="true"></span>
+      <span class="key-code mono">00</span>
+      <span class="key-name">Sala</span>
     </button>
-    <button class="dock-btn" data-dock-panel="bmp">
-      <span class="dock-icon">🩻</span>
-      <span>Escaner BMP</span>
+    <button class="key" type="button" data-dock-panel="bmp">
+      <span class="key-led" aria-hidden="true"></span>
+      <span class="key-code mono">01</span>
+      <span class="key-name">Escáner ECG</span>
     </button>
-    <button class="dock-btn" data-dock-panel="manual">
-      <span class="dock-icon">💓</span>
-      <span>Signos Vitales</span>
+    <button class="key" type="button" data-dock-panel="manual">
+      <span class="key-led" aria-hidden="true"></span>
+      <span class="key-code mono">02</span>
+      <span class="key-name">Variables</span>
     </button>
-    <button class="dock-btn" data-dock-panel="cases">
-      <span class="dock-icon">📋</span>
-      <span>Archivo &amp; Casos</span>
+    <button class="key" type="button" data-dock-panel="cases">
+      <span class="key-led" aria-hidden="true"></span>
+      <span class="key-code mono">03</span>
+      <span class="key-name">Archivo</span>
     </button>
-    <button class="dock-btn" data-dock-panel="neural">
-      <span class="dock-icon">🧠</span>
-      <span>Nucleo IA</span>
+    <button class="key" type="button" data-dock-panel="neural">
+      <span class="key-led" aria-hidden="true"></span>
+      <span class="key-code mono">04</span>
+      <span class="key-name">Núcleo IA</span>
     </button>
   </nav>
 
-  <!-- MODAL PARA CORREGIR DIAGNOSTICO -->
-  <div id="correct-modal" class="modal-backdrop hidden">
+  <!-- =====================================================
+       MODAL DE CORRECCIÓN
+       ===================================================== -->
+  <div id="correct-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="correct-modal-title">
     <div class="modal-card">
-      <h3>Corregir Diagnostico Medico</h3>
-      <p id="correct-modal-sub"></p>
-      <label>Diagnostico clinico verificado
+      <span class="panel-code mono">VERIFICACIÓN MÉDICA</span>
+      <h3 id="correct-modal-title">Corregir diagnóstico</h3>
+      <p id="correct-modal-sub" class="modal-sub"></p>
+      <label class="field">
+        <span class="field-label">Diagnóstico clínico verificado</span>
         <select id="correct-select">
-          <option value="0">0 - Ritmo Sinusal Normal</option>
-          <option value="1">1 - Arritmia Detectada</option>
-          <option value="2">2 - Infarto de Miocardio (MI)</option>
-          <option value="3">3 - Historial Post-MI</option>
+          <option value="0">0 · Ritmo sinusal normal</option>
+          <option value="1">1 · Arritmia detectada</option>
+          <option value="2">2 · Infarto de miocardio (MI)</option>
+          <option value="3">3 · Historial post-MI</option>
         </select>
       </label>
       <div class="modal-actions">
-        <button id="correct-cancel" class="btn-secondary">Cancelar</button>
-        <button id="correct-confirm" class="btn-primary">Guardar Correccion</button>
+        <button id="correct-cancel" type="button" class="btn btn-secondary">Cancelar</button>
+        <button id="correct-confirm" type="button" class="btn btn-primary">Guardar corrección</button>
       </div>
     </div>
   </div>
 
-  <div id="toast-container" class="toast-container"></div>
+  <!-- Pantalla de apagado -->
+  <div id="shutdown-screen" class="shutdown-screen hidden" role="status">
+    <span class="mono">SINA—VISUAL · SERVIDOR DETENIDO</span>
+    <p>El motor en C se ha apagado. Ya puede cerrar esta ventana.</p>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
   <script src="app.js"></script>
 </body>
 </html>
