@@ -796,6 +796,23 @@ input[type="range"] {
   margin-bottom: 10px;
 }
 
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-chip-danger {
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+
+.btn-chip-danger:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.16);
+}
+
 .table-scroll {
   max-height: 360px;
   overflow-y: auto;
@@ -846,6 +863,11 @@ input[type="range"] {
 
 .action-mini:hover {
   border-color: var(--cyan);
+}
+
+.action-mini-danger:hover {
+  border-color: #ef4444;
+  color: #fca5a5;
 }
 
 .stats-bars {

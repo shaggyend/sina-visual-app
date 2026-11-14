@@ -253,11 +253,14 @@
         <div class="card-block">
           <div class="table-toolbar">
             <h3>Historial de Evaluaciones</h3>
-            <div class="filter-tabs">
-              <button class="btn-chip active" data-filter="all">Todos</button>
-              <button class="btn-chip" data-filter="pending">Pendientes</button>
-              <button class="btn-chip" data-filter="verified">Verificados</button>
-              <button class="btn-chip" data-filter="discarded">Descartados</button>
+            <div class="toolbar-actions">
+              <div class="filter-tabs">
+                <button class="btn-chip active" data-filter="all">Todos</button>
+                <button class="btn-chip" data-filter="pending">Pendientes</button>
+                <button class="btn-chip" data-filter="verified">Verificados</button>
+                <button class="btn-chip" data-filter="discarded">Descartados</button>
+              </div>
+              <button type="button" id="btn-clear-discarded" class="btn-chip btn-chip-danger" title="Eliminar todos los casos descartados">Limpiar descartados</button>
             </div>
           </div>
           <div class="table-scroll">

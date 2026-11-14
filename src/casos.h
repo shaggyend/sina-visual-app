@@ -23,6 +23,12 @@ int cargar_todos_casos(Caso **lista_out, int *cantidad_out);
 /* Actualiza el estado de verificacion de un caso por indice (0-based) preservando todas las columnas. */
 int actualizar_estado_caso(int indice, int verificado, int descartado, int corregido, int tipo_correcto);
 
+/* Elimina un caso por indice (0-based) de reports/casos.csv y su .txt si ya no tiene otros casos. */
+int eliminar_caso(int indice);
+
+/* Elimina todos los casos marcados como descartados y devuelve cuantos fueron borrados. */
+int eliminar_casos_descartados(int *eliminados_out);
+
 /* Calcula estadisticas agregadas de los casos registrados. */
 EstadisticasCasos calcular_estadisticas_casos(void);
 

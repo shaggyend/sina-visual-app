@@ -53,8 +53,8 @@ Configuracion cargar_config(const char *archivo) {
     cfg.topologia_bmp[2] = 4;
     snprintf(cfg.dataset_bmp, sizeof(cfg.dataset_bmp), "data/dataset_bmp.csv");
     snprintf(cfg.pesos_bmp, sizeof(cfg.pesos_bmp), "data/pesos_bmp.nn");
-    cfg.tasa_bmp = 0.015f;
-    cfg.epocas_bmp = 120;
+    cfg.tasa_bmp = 0.020f;
+    cfg.epocas_bmp = 150;
 
     cfg.num_capas_manual = 3;
     cfg.topologia_manual[0] = 5;

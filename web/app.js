@@ -329,7 +329,7 @@ async function fileTo24BitBmpBuffer(file, forceConvert = false) {
       i.src = imgUrl;
     });
 
-    const maxDim = 512;
+    const maxDim = 2500;
     let w = img.naturalWidth || img.width;
     let h = img.naturalHeight || img.height;
     if (w > maxDim || h > maxDim) {
@@ -455,12 +455,18 @@ function draw32x32Matrix(pixels) {
   const octx = off.getContext("2d");
   const imgData = octx.createImageData(32, 32);
 
+  let maxVal = 1;
   for (let i = 0; i < 1024; i++) {
-    const v = pixels[i] ?? 0;
+    if ((pixels[i] ?? 0) > maxVal) maxVal = pixels[i];
+  }
+  const gain = Math.min(4.0, 255.0 / Math.max(64, maxVal));
+
+  for (let i = 0; i < 1024; i++) {
+    const v = Math.min(255, Math.round((pixels[i] ?? 0) * gain));
     const p = i * 4;
-    imgData.data[p]     = v;
-    imgData.data[p + 1] = Math.min(255, Math.round(v * 1.05));
-    imgData.data[p + 2] = Math.min(255, Math.round(v * 1.1));
+    imgData.data[p]     = Math.round(v * 0.45);
+    imgData.data[p + 1] = Math.min(255, Math.round(v * 0.95));
+    imgData.data[p + 2] = v;
     imgData.data[p + 3] = 255;
   }
   octx.putImageData(imgData, 0, 0);
@@ -650,6 +656,7 @@ function renderCasesTable() {
           <button class="action-mini" data-row-act="correct" data-idx="${c.index}" data-tipo="${c.tipo_diagnostico}" title="Corregir">✎</button>
           <button class="action-mini" data-row-act="discard" data-idx="${c.index}" title="Descartar">✕</button>
           <button class="action-mini" data-row-act="report" data-ced="${escapeHtml(c.cedula)}" title="Ver Reporte">📄</button>
+          <button class="action-mini action-mini-danger" data-row-act="delete" data-idx="${c.index}" data-nombre="${escapeHtml(c.nombre)}" title="Borrar caso">🗑</button>
         </td>
       </tr>
     `;
@@ -935,6 +942,38 @@ document.addEventListener("DOMContentLoaded", () => {
         refreshCasesAndStats();
         refreshStatus();
       });
+    } else if (act === "delete") {
+      const nom = btn.dataset.nombre || `#${idx + 1}`;
+      if (!window.confirm(`¿Eliminar permanentemente el caso de "${nom}"?`)) return;
+      try {
+        await apiJson("/api/cases/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ index: idx })
+        });
+        showToast("Caso eliminado del historial");
+        refreshCasesAndStats();
+        refreshStatus();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+  });
+
+  document.getElementById("btn-clear-discarded").addEventListener("click", async () => {
+    const numDesc = state.cases.filter((c) => c.descartado).length;
+    if (numDesc === 0) {
+      showToast("No hay casos descartados para limpiar.");
+      return;
+    }
+    if (!window.confirm(`¿Eliminar permanentemente los ${numDesc} caso(s) descartados?`)) return;
+    try {
+      const res = await apiJson("/api/cases/clear-discarded", { method: "POST" });
+      showToast(`${res.eliminados} caso(s) descartado(s) eliminados`);
+      refreshCasesAndStats();
+      refreshStatus();
+    } catch (err) {
+      showToast(err.message, true);
     }
   });
 

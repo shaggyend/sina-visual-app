@@ -2,8 +2,8 @@
 TOPOLOGIA_BMP=1024,64,4
 DATASET_BMP=data/dataset_bmp.csv
 PESOS_BMP=data/pesos_bmp.nn
-TASA_BMP=0.015
-EPOCAS_BMP=120
+TASA_BMP=0.020
+EPOCAS_BMP=150
 
 # --- RED MANUAL (Variables Clinicas ECG) ---
 TOPOLOGIA_MANUAL=5,12,4

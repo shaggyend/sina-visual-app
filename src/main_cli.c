@@ -55,22 +55,20 @@ static void analisis_foto(redNeuronal *red_bmp) {
 
     int inputs = red_bmp->topologia[0];
     int lado = 32;
-    unsigned char *pixeles_redi = redimensionar_grises(pixeles, ancho, alto, lado, lado);
-    free(pixeles);
+    float *entradas = malloc((size_t)inputs * sizeof(float));
+    if (!entradas) {
+        free(pixeles);
+        return;
+    }
 
-    if (!pixeles_redi) {
-        printf(ROJO "  Error redimensionando imagen.\n" RESET);
+    int ok_ext = extraer_entradas_ecg(pixeles, ancho, alto, lado, entradas, NULL);
+    free(pixeles);
+    if (!ok_ext) {
+        free(entradas);
+        printf(ROJO "  Error extrayendo matriz ECG.\n" RESET);
         pausar();
         return;
     }
-
-    float *entradas = malloc((size_t)inputs * sizeof(float));
-    if (!entradas) {
-        free(pixeles_redi);
-        return;
-    }
-    preparar_entradas_bmp(pixeles_redi, entradas, inputs);
-    free(pixeles_redi);
 
     printf(DIM "\n  Procesando red neuronal BMP...\n" RESET);
     caso.resultado = clasificar(red_bmp, entradas);

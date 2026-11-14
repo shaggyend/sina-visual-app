@@ -151,32 +151,13 @@ int cargar_todos_casos(Caso **lista_out, int *cantidad_out) {
     return 1;
 }
 
-int actualizar_estado_caso(int indice, int verificado, int descartado, int corregido, int tipo_correcto) {
-    Caso *lista = NULL;
-    int cantidad = 0;
-    if (!cargar_todos_casos(&lista, &cantidad)) return 0;
-
-    if (indice < 0 || indice >= cantidad) {
-        free(lista);
-        return 0;
-    }
-
-    lista[indice].verificado = verificado;
-    lista[indice].descartado = descartado;
-    lista[indice].diagnostico_corregido = corregido;
-    if (tipo_correcto >= 0 && tipo_correcto < NUM_CLASES_ECG) {
-        lista[indice].tipo_correcto = tipo_correcto;
-    }
-
+static int reescribir_lista_casos(const Caso *lista, int cantidad) {
     char ruta_real[512] = ARCHIVO_CASOS_DEFECTO;
     FILE *f_check = abrir_archivo_relativo(ARCHIVO_CASOS_DEFECTO, "r", ruta_real, sizeof(ruta_real));
     if (f_check) fclose(f_check);
 
     FILE *f = fopen(ruta_real, "w");
-    if (!f) {
-        free(lista);
-        return 0;
-    }
+    if (!f) return 0;
 
     for (int i = 0; i < cantidad; i++) {
         char nombre[100], cedula[20], medico[100], fecha[20];
@@ -196,6 +177,46 @@ int actualizar_estado_caso(int indice, int verificado, int descartado, int corre
                 lista[i].usa_bmp);
     }
     fclose(f);
+    return 1;
+}
+
+static void borrar_reporte_si_huerfano(const char *cedula, const Caso *restantes, int cantidad_restante) {
+    if (!cedula || cedula[0] == '\0') return;
+    for (int i = 0; i < cantidad_restante; i++) {
+        if (strcmp(restantes[i].paciente.cedula, cedula) == 0) {
+            return; /* Aun hay otro caso asociado a esta cedula */
+        }
+    }
+    char ruta_rep[160], ruta_real[512];
+    snprintf(ruta_rep, sizeof(ruta_rep), "reports/%s.txt", cedula);
+    FILE *f = abrir_archivo_relativo(ruta_rep, "r", ruta_real, sizeof(ruta_real));
+    if (f) {
+        fclose(f);
+        remove(ruta_real);
+    }
+}
+
+int actualizar_estado_caso(int indice, int verificado, int descartado, int corregido, int tipo_correcto) {
+    Caso *lista = NULL;
+    int cantidad = 0;
+    if (!cargar_todos_casos(&lista, &cantidad)) return 0;
+
+    if (indice < 0 || indice >= cantidad) {
+        free(lista);
+        return 0;
+    }
+
+    lista[indice].verificado = verificado;
+    lista[indice].descartado = descartado;
+    lista[indice].diagnostico_corregido = corregido;
+    if (tipo_correcto >= 0 && tipo_correcto < NUM_CLASES_ECG) {
+        lista[indice].tipo_correcto = tipo_correcto;
+    }
+
+    if (!reescribir_lista_casos(lista, cantidad)) {
+        free(lista);
+        return 0;
+    }
 
     /* Registrar la actualizacion medica en el reporte individual */
     char ruta_rep[160];
@@ -216,6 +237,66 @@ int actualizar_estado_caso(int indice, int verificado, int descartado, int corre
 
     free(lista);
     return 1;
+}
+
+int eliminar_caso(int indice) {
+    Caso *lista = NULL;
+    int cantidad = 0;
+    if (!cargar_todos_casos(&lista, &cantidad)) return 0;
+
+    if (indice < 0 || indice >= cantidad) {
+        free(lista);
+        return 0;
+    }
+
+    char cedula_elim[20];
+    snprintf(cedula_elim, sizeof(cedula_elim), "%s", lista[indice].paciente.cedula);
+
+    for (int i = indice; i < cantidad - 1; i++) {
+        lista[i] = lista[i + 1];
+    }
+    cantidad--;
+
+    int ok = reescribir_lista_casos(lista, cantidad);
+    if (ok) {
+        borrar_reporte_si_huerfano(cedula_elim, lista, cantidad);
+    }
+    free(lista);
+    return ok;
+}
+
+int eliminar_casos_descartados(int *eliminados_out) {
+    if (eliminados_out) *eliminados_out = 0;
+    Caso *lista = NULL;
+    int cantidad = 0;
+    if (!cargar_todos_casos(&lista, &cantidad)) return 0;
+
+    Caso *borrados = malloc((size_t)(cantidad > 0 ? cantidad : 1) * sizeof(Caso));
+    if (!borrados) {
+        free(lista);
+        return 0;
+    }
+
+    int kept = 0, del_count = 0;
+    for (int i = 0; i < cantidad; i++) {
+        if (lista[i].descartado) {
+            borrados[del_count++] = lista[i];
+        } else {
+            lista[kept++] = lista[i];
+        }
+    }
+
+    int ok = reescribir_lista_casos(lista, kept);
+    if (ok) {
+        for (int i = 0; i < del_count; i++) {
+            borrar_reporte_si_huerfano(borrados[i].paciente.cedula, lista, kept);
+        }
+        if (eliminados_out) *eliminados_out = del_count;
+    }
+
+    free(borrados);
+    free(lista);
+    return ok;
 }
 
 EstadisticasCasos calcular_estadisticas_casos(void) {

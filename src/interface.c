@@ -310,7 +310,7 @@ void mostrar_menu_admin(void) {
 
 void gestionar_casos(void) {
     int opcion = 0;
-    while (opcion != 4) {
+    while (opcion != 5) {
         Caso *lista = NULL;
         int cantidad = 0;
         if (!cargar_todos_casos(&lista, &cantidad)) {
@@ -344,9 +344,10 @@ void gestionar_casos(void) {
         printf(BLANCO "  1." RESET " Revisar casos pendientes\n");
         printf(BLANCO "  2." RESET " Ver casos verificados\n");
         printf(BLANCO "  3." RESET " Ver casos descartados\n");
-        printf(BLANCO "  4." RESET " Volver\n");
+        printf(BLANCO "  4." RESET " Eliminar un caso por numero\n");
+        printf(BLANCO "  5." RESET " Volver\n");
         printf("\n  Opcion: ");
-        opcion = pedir_opcion(1, 4, 1);
+        opcion = pedir_opcion(1, 5, 1);
 
         if (opcion == 1 && pendientes > 0) {
             for (int i = 0; i < cantidad; i++) {
@@ -362,9 +363,10 @@ void gestionar_casos(void) {
                     printf("  1. Verificar (Correcto)\n");
                     printf("  2. Corregir diagnostico\n");
                     printf("  3. Descartar (Mala lectura)\n");
-                    printf("  4. Saltar por ahora\n");
+                    printf("  4. Eliminar caso permanentemente\n");
+                    printf("  5. Saltar por ahora\n");
                     printf("\n  Opcion: ");
-                    int accion = pedir_opcion(1, 4, 1);
+                    int accion = pedir_opcion(1, 5, 1);
 
                     if (accion == 1) {
                         actualizar_estado_caso(i, 1, 0, 0, lista[i].resultado.tipo_diagnostico);
@@ -374,8 +376,37 @@ void gestionar_casos(void) {
                         actualizar_estado_caso(i, 1, 0, 1, corr - 1);
                     } else if (accion == 3) {
                         actualizar_estado_caso(i, 1, 1, 0, lista[i].resultado.tipo_diagnostico);
+                    } else if (accion == 4) {
+                        if (eliminar_caso(i)) {
+                            printf(VERDE "\n  Caso eliminado.\n" RESET);
+                            pausar();
+                            break; /* Recargar indices actualizados en el bucle */
+                        }
                     }
                 }
+            }
+        } else if (opcion == 4) {
+            mostrar_encabezado();
+            printf(AMARILLO "\n  === ELIMINAR CASO CLINICO ===\n\n" RESET);
+            for (int i = 0; i < cantidad; i++) {
+                int tipo_show = lista[i].diagnostico_corregido
+                                    ? lista[i].tipo_correcto
+                                    : lista[i].resultado.tipo_diagnostico;
+                printf("  %2d. %s (C.I: %s) -> %s\n",
+                       i + 1,
+                       lista[i].paciente.nombre,
+                       lista[i].paciente.cedula,
+                       obtener_descripcion(tipo_show));
+            }
+            printf("\n  Numero a eliminar (1-%d, 0 o ESC cancelar): ", cantidad);
+            int num = pedir_opcion(0, cantidad, 1);
+            if (num > 0) {
+                if (eliminar_caso(num - 1)) {
+                    printf(VERDE "\n  Caso #%d eliminado correctamente.\n" RESET, num);
+                } else {
+                    printf(ROJO "\n  No se pudo eliminar el caso.\n" RESET);
+                }
+                pausar();
             }
         } else if (opcion == 2 || opcion == 3) {
             mostrar_encabezado();

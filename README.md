@@ -10,7 +10,7 @@ Sistema híbrido de apoyo al diagnóstico electrocardiográfico (**ECG**) implem
 Dos redes neuronales multicapa (**MLP**) independientes construidas desde cero:
 - **Red de Visión ECG (BMP)** — Topología `1024 → 64 → 4`:
   - Parsea imágenes `.bmp` de 24/32 bits directamente desde archivo o memoria (`constructor_bmp.c`).
-  - Convierte a escala de grises por luminancia (`0.299R + 0.587G + 0.114B`), redimensiona a `32×32` con muestreo centrado e invierte automáticamente fondos blancos de papel ECG.
+  - Convierte a escala de grises por luminancia (`0.299R + 0.587G + 0.114B`), aísla el trazo ECG sobre el fondo de papel adaptativo y redimensiona a `32×32` mediante promediado por área (*box filter*).
 - **Red de Variables Clínicas (Manual)** — Topología `5 → 12 → 4`:
   - Evalúa `RR (ms)`, `PR (ms)`, `QRS (ms)`, `QT (ms)` y `BPM` normalizados frente a rangos clínicos.
 - **Entrenamiento & Persistencia**:
@@ -23,7 +23,7 @@ Dos redes neuronales multicapa (**MLP**) independientes construidas desde cero:
   - Monitor holográfico con onda **P-QRS-T** dibujada en vivo en `<canvas>`, adaptable al diagnóstico y BPM detectado (alerta visual normal, advertencia o crítica).
   - Estaciones interactivas en la sala: **Escáner BMP**, **Signos Vitales**, **Archivo Clínico & Reportes** y **Núcleo IA (Admin)**.
   - Conversión automática en cliente de `.png`/`.jpg` a `.bmp` 24-bit sin compresión y visualización en vivo de la matriz neuronal `32×32`.
-  - Flujo médico completo: confirmar diagnóstico, corregir etiqueta clínica o descartar lectura por ruido, con generación e impresión de reportes por cédula.
+  - Flujo médico completo: confirmar diagnóstico, corregir etiqueta clínica, descartar lectura por ruido o eliminar casos no deseados, con generación e impresión de reportes por cédula.
 - **Modo Consola Clásico (`sina_visual_cli.exe`)**:
   - Versión terminal ANSI completamente depurada con la misma lógica central compartida.
 
@@ -49,7 +49,7 @@ SINA-VISUAL-APP/
 ├── compilar.bat              # Script de compilacion (App Visual + CLI)
 ├── data/
 │   ├── config.txt            # Topologias, hiperparametros, puerto y PIN admin
-│   ├── dataset_bmp.csv       # Dataset de imagenes ECG 32x32 (397 muestras)
+│   ├── dataset_bmp.csv       # Dataset de imagenes ECG 32x32 (928 muestras, 4 clases)
 │   ├── dataset_manual.csv    # Dataset de variables clinicas ECG
 │   ├── pesos_bmp.nn          # Pesos persistidos de la Red BMP
 │   └── pesos_manual.nn       # Pesos persistidos de la Red Manual
@@ -104,6 +104,6 @@ La contraseña de administrador por defecto para re-entrenar modelos se configur
 - `POST /api/analyze/bmp` — Recibe un binario BMP en memoria, lo procesa y clasifica.
 - `POST /api/analyze/sample` — Evalúa una muestra de `samples/`.
 - `POST /api/analyze/manual` — Evalúa las 5 variables electrocardiográficas.
-- `GET /api/cases` / `POST /api/cases/verify` — Consulta, confirma, corrige o descarta casos.
+- `GET /api/cases` / `POST /api/cases/verify` / `POST /api/cases/delete` — Consulta, verifica, corrige, descarta o elimina casos.
 - `GET /api/stats` / `GET /api/report?cedula=...` — Estadísticas y reporte clínico.
 - `POST /api/train` / `GET /api/training-log` — Re-entrenamiento y series históricas.

@@ -33,9 +33,13 @@ unsigned char *cargar_bmp_grises(const char *ruta, int *ancho, int *alto);
 /* Carga BMP de 24/32 bits desde un buffer en memoria a escala de grises (0-255). */
 unsigned char *cargar_bmp_grises_mem(const unsigned char *buffer, size_t tamano_buffer, int *ancho, int *alto);
 
-/* Redimensiona buffer de grises por vecino mas cercano. */
+/* Redimensiona buffer de grises mediante promediado por area (box-filter) con respaldo bilineal. */
 unsigned char *redimensionar_grises(const unsigned char *pixeles, int ancho_orig, int alto_orig,
                                     int nuevo_ancho, int nuevo_alto);
+
+/* Extrae densidad de trazo ECG normalizada [0..1] por area sobre fondo de papel adaptativo (y preview opcional). */
+int extraer_entradas_ecg(const unsigned char *pixeles, int ancho_orig, int alto_orig,
+                         int lado, float *entradas, unsigned char *preview_out);
 
 /* Normaliza pixeles [0..255] a [0..1], invirtiendo automaticamente fondo blanco de papel ECG. */
 void preparar_entradas_bmp(const unsigned char *pixeles, float *entradas, int n);

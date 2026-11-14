@@ -423,20 +423,24 @@ static void ejecutar_analisis_bmp_buffer(SOCKET sock, AppState *st, const unsign
 
     int inputs = st->red_bmp->topologia[0];
     int lado = 32;
-    unsigned char *redi = redimensionar_grises(pixeles, ancho, alto, lado, lado);
-    free(pixeles);
-    if (!redi) {
-        enviar_json_error(sock, 500, "Error redimensionando imagen BMP");
-        return;
-    }
-
+    unsigned char *redi = malloc((size_t)(lado * lado));
     float *entradas = malloc((size_t)inputs * sizeof(float));
-    if (!entradas) {
+    if (!redi || !entradas) {
+        free(pixeles);
         free(redi);
+        free(entradas);
         enviar_json_error(sock, 500, "Memoria insuficiente");
         return;
     }
-    preparar_entradas_bmp(redi, entradas, inputs);
+
+    int ok_ext = extraer_entradas_ecg(pixeles, ancho, alto, lado, entradas, redi);
+    free(pixeles);
+    if (!ok_ext) {
+        free(redi);
+        free(entradas);
+        enviar_json_error(sock, 500, "Error extrayendo matriz ECG de la imagen");
+        return;
+    }
 
     Caso caso;
     memset(&caso, 0, sizeof(Caso));
@@ -444,14 +448,6 @@ static void ejecutar_analisis_bmp_buffer(SOCKET sock, AppState *st, const unsign
     caso.usa_bmp = 1;
     caso.resultado = clasificar(st->red_bmp, entradas);
     caso.tipo_correcto = caso.resultado.tipo_diagnostico;
-
-    /* Reflejar la matriz normalizada exacta que recibe la red (trazo brillante) */
-    for (int i = 0; i < lado * lado; i++) {
-        int val = (int)(entradas[i] * 255.0f + 0.5f);
-        if (val < 0) val = 0;
-        if (val > 255) val = 255;
-        redi[i] = (unsigned char)val;
-    }
     free(entradas);
 
     guardar_caso_clinico(&caso);
@@ -683,6 +679,44 @@ static void handle_api_cases_verify(SOCKET sock, const char *body) {
     sb_free(&sb);
 }
 
+static void handle_api_cases_delete(SOCKET sock, const char *body) {
+    if (!body) {
+        enviar_json_error(sock, 400, "Cuerpo JSON requerido");
+        return;
+    }
+
+    double idx = -1;
+    if (!json_get_double(body, "index", &idx)) {
+        enviar_json_error(sock, 400, "Indice de caso requerido");
+        return;
+    }
+
+    if (!eliminar_caso((int)idx)) {
+        enviar_json_error(sock, 400, "No se pudo eliminar el caso");
+        return;
+    }
+
+    StrBuf sb;
+    sb_init(&sb, 64);
+    sb_append(&sb, "{\"ok\":true}");
+    enviar_json(sock, 200, "OK", &sb);
+    sb_free(&sb);
+}
+
+static void handle_api_cases_clear_discarded(SOCKET sock) {
+    int eliminados = 0;
+    if (!eliminar_casos_descartados(&eliminados)) {
+        enviar_json_error(sock, 500, "No se pudieron eliminar los casos descartados");
+        return;
+    }
+
+    StrBuf sb;
+    sb_init(&sb, 96);
+    sb_printf(&sb, "{\"ok\":true,\"eliminados\":%d}", eliminados);
+    enviar_json(sock, 200, "OK", &sb);
+    sb_free(&sb);
+}
+
 static void handle_api_stats(SOCKET sock) {
     EstadisticasCasos est = calcular_estadisticas_casos();
     StrBuf sb;
@@ -796,8 +830,8 @@ static void handle_api_train(SOCKET sock, AppState *st, const char *body) {
         return;
     }
 
-    int train_bmp = (strcmp(target, "bmp") == 0 || strcmp(target, "both") == 0);
-    int train_manual = (strcmp(target, "manual") == 0 || strcmp(target, "both") == 0);
+    int train_bmp = (strcmp(target, "bmp") == 0 || strcmp(target, "both") == 0 || strcmp(target, "all") == 0);
+    int train_manual = (strcmp(target, "manual") == 0 || strcmp(target, "both") == 0 || strcmp(target, "all") == 0);
 
     if (train_bmp) {
         datos *ds = cargar_dataset(st->cfg.dataset_bmp, st->cfg.topologia_bmp[0],
@@ -954,6 +988,10 @@ static void procesar_cliente(SOCKET sock, AppState *st) {
         handle_api_analyze_manual(sock, st, body);
     } else if (strcmp(metodo, "POST") == 0 && strcmp(path, "/api/cases/verify") == 0) {
         handle_api_cases_verify(sock, body);
+    } else if (strcmp(metodo, "POST") == 0 && strcmp(path, "/api/cases/delete") == 0) {
+        handle_api_cases_delete(sock, body);
+    } else if (strcmp(metodo, "POST") == 0 && strcmp(path, "/api/cases/clear-discarded") == 0) {
+        handle_api_cases_clear_discarded(sock);
     } else if (strcmp(metodo, "POST") == 0 && strcmp(path, "/api/train") == 0) {
         handle_api_train(sock, st, body);
     } else if (strcmp(metodo, "POST") == 0 && strcmp(path, "/api/shutdown") == 0) {
