@@ -31,12 +31,19 @@ static void analisis_foto(redNeuronal *red_bmp) {
     }
 
     caso.usa_bmp = 1;
-    char ruta[256];
+    char ruta[512];
     printf("\n  Ruta de la imagen (.bmp): ");
     if (!LeerCadenaSegura(ruta, sizeof(ruta), 3)) {
         printf(AMARILLO "\n  Operacion cancelada.\n" RESET);
         pausar();
         return;
+    }
+
+    /* Quitar comillas si se arrastro el archivo a la consola */
+    size_t rlen = strlen(ruta);
+    if (rlen >= 2 && ruta[0] == '"' && ruta[rlen - 1] == '"') {
+        memmove(ruta, ruta + 1, rlen - 2);
+        ruta[rlen - 2] = '\0';
     }
 
     int ancho = 0, alto = 0;

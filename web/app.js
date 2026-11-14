@@ -49,7 +49,12 @@ function showToast(msg, isError = false) {
 }
 
 async function apiJson(url, options = {}) {
-  const res = await fetch(url, options);
+  let res;
+  try {
+    res = await fetch(url, options);
+  } catch (_) {
+    throw new Error("Sin conexion con el servidor C. Ejecuta output\\SINA-VISUAL.exe para iniciar el motor.");
+  }
   const data = await res.json();
   if (!res.ok || data.ok === false) {
     throw new Error(data.error || `Error HTTP ${res.status}`);
@@ -299,10 +304,19 @@ function startEcgOscilloscope() {
 /* ===================================================
    CONVERSOR CLIENT-SIDE PNG/JPG -> BMP 24-BIT
    =================================================== */
-async function fileTo24BitBmpBuffer(file) {
+async function fileTo24BitBmpBuffer(file, forceConvert = false) {
   const ext = file.name.toLowerCase();
-  if (ext.endsWith(".bmp")) {
-    return await file.arrayBuffer();
+  if (ext.endsWith(".bmp") && !forceConvert) {
+    const raw = await file.arrayBuffer();
+    if (raw.byteLength >= 54) {
+      const view = new DataView(raw);
+      const sig = view.getUint16(0, true);
+      const bpp = view.getUint16(28, true);
+      const comp = view.getUint32(30, true);
+      if (sig === 0x4D42 && comp === 0 && (bpp === 24 || bpp === 32)) {
+        return raw;
+      }
+    }
   }
 
   // Cargar imagen en canvas y codificar BMP 24-bit sin compresion
