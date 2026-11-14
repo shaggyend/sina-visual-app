@@ -101,7 +101,7 @@ function openPanel(panelName) {
 /* ===================================================
    MONITOR ECG HOLOGRAFICO EN TIEMPO REAL
    =================================================== */
-function playBeep(freq = 880, dur = 0.06) {
+function playBeep(freq = 760, dur = 0.14) {
   if (!state.audioEnabled) return;
   try {
     if (!state.audioCtx) {
@@ -109,16 +109,18 @@ function playBeep(freq = 880, dur = 0.06) {
     }
     const ctx = state.audioCtx;
     if (ctx.state === "suspended") ctx.resume();
+    const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = "sine";
     osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.05, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    gain.gain.setValueAtTime(0.0005, now);
+    gain.gain.linearRampToValueAtTime(0.035, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0005, now + dur);
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + dur);
+    osc.start(now);
+    osc.stop(now + dur);
   } catch (_) {
     /* Ignorar si navegador bloquea audio */
   }
@@ -159,9 +161,12 @@ function startEcgOscilloscope() {
   const W = canvas.width;
   const H = canvas.height;
   const buffer = new Array(W).fill(H * 0.56);
+  let cursorFloat = 0;
   let cursor = 0;
   let phase = 0;
   let lastBeatCycle = -1;
+  let lastTime = performance.now();
+  let lastBeepTime = 0;
 
   function ecgSample(p, mode) {
     // Onda P-QRS-T sintetizada en fase [0..1)
@@ -190,28 +195,44 @@ function startEcgOscilloscope() {
     return y;
   }
 
-  function frame() {
+  function frame(now) {
+    const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000.0));
+    lastTime = now;
+
+    // Ritmo lento, calmado e independiente de los Hz del monitor (60Hz/144Hz)
     const bps = Math.max(0.5, state.ecgBpm / 60.0);
-    const speedPx = 2;
+    const tempoScale = 0.35;
+    const pxPerSec = 72;
 
-    for (let s = 0; s < speedPx; s++) {
-      let step = (bps / 60.0) * 0.55;
-      if (state.ecgMode === 1) {
-        step *= 0.85 + 0.35 * Math.sin(Date.now() * 0.004);
+    let stepPhase = bps * tempoScale * dt;
+    if (state.ecgMode === 1) {
+      stepPhase *= 0.85 + 0.25 * Math.sin(now * 0.003);
+    }
+    phase += stepPhase;
+
+    const cycle = Math.floor(phase);
+    const localPhase = phase - cycle;
+
+    if (localPhase > 0.27 && localPhase < 0.38 && cycle !== lastBeatCycle) {
+      lastBeatCycle = cycle;
+      if (now - lastBeepTime >= 900) {
+        lastBeepTime = now;
+        const freq = state.ecgMode === 2 ? 520 : state.ecgMode === 1 ? 820 : 720;
+        playBeep(freq, 0.14);
       }
-      phase += step;
-      const cycle = Math.floor(phase);
-      const localPhase = phase - cycle;
+    }
 
-      if (localPhase > 0.29 && localPhase < 0.34 && cycle !== lastBeatCycle) {
-        lastBeatCycle = cycle;
-        const freq = state.ecgMode === 2 ? 620 : state.ecgMode === 1 ? 980 : 840;
-        playBeep(freq, 0.05);
-      }
+    const prevCursor = Math.floor(cursorFloat) % W;
+    cursorFloat = (cursorFloat + pxPerSec * dt) % W;
+    const nextCursor = Math.floor(cursorFloat) % W;
+    const steps = (nextCursor - prevCursor + W) % W;
 
-      const amp = ecgSample(localPhase, state.ecgMode);
+    for (let s = 1; s <= steps; s++) {
+      cursor = (prevCursor + s) % W;
+      const frac = s / steps;
+      const interpPhase = (phase - stepPhase * (1 - frac)) % 1;
+      const amp = ecgSample(interpPhase < 0 ? interpPhase + 1 : interpPhase, state.ecgMode);
       buffer[cursor] = H * 0.62 - amp * (H * 0.44);
-      cursor = (cursor + 1) % W;
     }
 
     ctx.fillStyle = "#030b14";
@@ -743,7 +764,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-audio-toggle").addEventListener("click", (e) => {
     state.audioEnabled = !state.audioEnabled;
     e.currentTarget.textContent = state.audioEnabled ? "Sonido: ON" : "Sonido: OFF";
-    if (state.audioEnabled) playBeep(880, 0.05);
+    if (state.audioEnabled) playBeep(720, 0.14);
   });
 
   document.getElementById("btn-shutdown").addEventListener("click", async () => {
