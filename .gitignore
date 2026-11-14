@@ -1,0 +1,16 @@
+# Binarios compilados
+output/*.exe
+*.exe
+*.o
+*.obj
+
+# Registros clinicos locales de pacientes
+reports/casos.csv
+reports/casos_temp.csv
+reports/*.txt
+!reports/.gitkeep
+
+# IDE / Temporales
+.vscode/
+*.tmp
+*.log

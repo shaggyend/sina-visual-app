@@ -1,0 +1,18 @@
+# --- RED BMP (Analisis de Imagen ECG 32x32) ---
+TOPOLOGIA_BMP=1024,64,4
+DATASET_BMP=data/dataset_bmp.csv
+PESOS_BMP=data/pesos_bmp.nn
+TASA_BMP=0.015
+EPOCAS_BMP=120
+
+# --- RED MANUAL (Variables Clinicas ECG) ---
+TOPOLOGIA_MANUAL=5,12,4
+DATASET_MANUAL=data/dataset_manual.csv
+PESOS_MANUAL=data/pesos_manual.nn
+TASA_MANUAL=0.08
+EPOCAS_MANUAL=400
+
+# --- SISTEMA Y SERVIDOR ---
+EPOCAS_GENERAL=120
+PUERTO_SERVIDOR=8080
+ADMIN_PIN=admin123
