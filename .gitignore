@@ -14,3 +14,6 @@ reports/*.txt
 .vscode/
 *.tmp
 *.log
+
+# Dataset crudo de imagenes (pesado para Git; ya resumido en data/dataset_bmp.csv)
+ecg_data/
